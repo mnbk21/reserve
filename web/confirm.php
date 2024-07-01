@@ -3,6 +3,49 @@ require_once 'functions.php';
 
 session_start();
 
+// 予約確定ボタンが押された場合の処理
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  // セッションから入力情報を取得する
+  if (isset($_SESSION['RESERVE'])) {
+    $reserve_date = $_SESSION['RESERVE']['reserve_date'];
+    $reserve_num = $_SESSION['RESERVE']['reserve_num'];
+    $reserve_time = $_SESSION['RESERVE']['reserve_time'];
+    $name = $_SESSION['RESERVE']['name'];
+    $email = $_SESSION['RESERVE']['email'];
+    $tel = $_SESSION['RESERVE']['tel'];
+    $comment = $_SESSION['RESERVE']['comment'];
+
+    //TODO:予約が確定可能かどうか最終チェック
+
+    // DBに接続
+    $pdo = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';', DB_USER, DB_PASSWORD);
+    $pdo->query('SET NAMES utf8;');
+
+    // reserveテーブルにINSERT
+    $stmt = $pdo->prepare('INSERT INTO reserve (reserve_date, reserve_time, reserve_num, name, email, tel, comment) VALUES (:reserve_date, :reserve_time, :reserve_num, :name, :email, :tel, :comment)');
+    $stmt->bindValue(':reserve_date', $reserve_date, PDO::PARAM_STR);
+    $stmt->bindValue(':reserve_time', $reserve_time, PDO::PARAM_STR);
+    $stmt->bindValue(':reserve_num', $reserve_num, PDO::PARAM_INT);
+    $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+    $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+    $stmt->bindValue(':tel', $tel, PDO::PARAM_STR);
+    $stmt->bindValue(':comment', $comment, PDO::PARAM_STR);
+    $stmt->execute();
+
+    // 予約が正常に完了したらセッションのデータをクリアする
+    unset($_SESSION['RESERVE']);
+
+    // DBから切断
+    unset($pdo);
+
+    // 予約完了画面の表示
+    header('Location: /complete.php');
+    exit;
+  } else {
+    // セッションからデータが取得出来ない場合はエラー
+    //TODO:エラー処理
+  }
+}
 ?>
 <!doctype html>
 <html lang="ja">
@@ -23,51 +66,55 @@ session_start();
 
   <body>
     <header>SAMPLE SHOP</header>
+
     <h1>予約内容確認</h1>
-    <table class="table">
-      <tbody>
-        <tr>
-          <th scope="row">日時</th>
-          <td><?= format_date($_SESSION['RESERVE']['reserve_date']) ?> <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
-        </tr>
-        <tr>
-          <th scope="row">人数</th>
-          <td><?= $_SESSION['RESERVE']['reserve_num'] ?>名</td>
-        </tr>
-        <tr>
-          <th scope="row">氏名</th>
-          <td colspan="2"><?= $_SESSION['RESERVE']['name'] ?></td>
-        </tr>
-        <tr>
-          <th scope="row">メールアドレス</th>
-          <td colspan="2"><?= $_SESSION['RESERVE']['email'] ?></td>
-        </tr>
-        <tr>
-          <th scope="row">電話番号</th>
-          <td colspan="2"><?= $_SESSION['RESERVE']['tel'] ?></td>
-        </tr>
-        <tr>
-          <th scope="row">備考</th>
-          <td colspan="2"><?= nl2br($_SESSION['RESERVE']['comment']) ?></td>
-        </tr>
-      </tbody>
-    </table>
 
-    <div class="d-grid gap-2 mx-3">
-      <a class="btn btn-primary rounded-pill" href="complete.php">予約確定</a>
-      <a class="btn btn-secondary rounded-pill" href="/">戻る</a>
-    </div>
+    <form method="post">
+      <table class="table">
+        <tbody>
+          <tr>
+            <th scope="row">日時</th>
+            <td><?= format_date($_SESSION['RESERVE']['reserve_date']) ?> <?= $_SESSION['RESERVE']['reserve_time'] ?></td>
+          </tr>
+          <tr>
+            <th scope="row">人数</th>
+            <td><?= $_SESSION['RESERVE']['reserve_num'] ?>名</td>
+          </tr>
+          <tr>
+            <th scope="row">氏名</th>
+            <td colspan="2"><?= $_SESSION['RESERVE']['name'] ?></td>
+          </tr>
+          <tr>
+            <th scope="row">メールアドレス</th>
+            <td colspan="2"><?= $_SESSION['RESERVE']['email'] ?></td>
+          </tr>
+          <tr>
+            <th scope="row">電話番号</th>
+            <td colspan="2"><?= $_SESSION['RESERVE']['tel'] ?></td>
+          </tr>
+          <tr>
+            <th scope="row">備考</th>
+            <td colspan="2"><?= nl2br($_SESSION['RESERVE']['comment']) ?></td>
+          </tr>
+        </tbody>
+      </table>
 
-    <!-- Optional JavaScript; choose one of the two! -->
+      <div class="d-grid gap-2 mx-3">
+        <button class="btn btn-primary rounded-pill" type="submit">予約確定</button>
+        <a class="btn btn-secondary rounded-pill" href="/">戻る</a>
+      </div>
+    </form>
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+      <!-- Optional JavaScript; choose one of the two! -->
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-    -->
+      <!-- Option 1: Bootstrap Bundle with Popper -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+      <!-- Option 2: Separate Popper and Bootstrap JS -->
+      <!--
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+      -->
   </body>
 
 </html>

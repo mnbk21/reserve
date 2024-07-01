@@ -1,4 +1,6 @@
 <?php
+require_once '../config/config.php';
+
 // 引数で与えられた配列を元にプルダウンリストを生成する
 function arrayToSelect($inputName, $srcArray, $selectedIndex = "")
 {
@@ -7,9 +9,9 @@ function arrayToSelect($inputName, $srcArray, $selectedIndex = "")
   foreach ($srcArray as $key => $val) {
     // キーと選択値を比較して一致したらselectedを付ける
     if ($key == $selectedIndex) {
-      $selectedText = " selected";
+        $selectedText = " selected";
     } else {
-      $selectedText = "";
+        $selectedText = "";
     }
     $temphtml .= "<option value=\"{$key}\"{$selectedText}>{$val}</option>" . PHP_EOL;
   }
