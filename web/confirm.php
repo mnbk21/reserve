@@ -7,30 +7,30 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   // セッションから入力情報を取得する
   if (isset($_SESSION['RESERVE'])) {
-    // $reserve_date = $_SESSION['RESERVE']['reserve_date'];
-    // $reserve_num = $_SESSION['RESERVE']['reserve_num'];
-    // $reserve_time = $_SESSION['RESERVE']['reserve_time'];
-    // $name = $_SESSION['RESERVE']['name'];
-    // $email = $_SESSION['RESERVE']['email'];
-    // $tel = $_SESSION['RESERVE']['tel'];
-    // $comment = $_SESSION['RESERVE']['comment'];
+    $reserve_date = $_SESSION['RESERVE']['reserve_date'];
+    $reserve_num = $_SESSION['RESERVE']['reserve_num'];
+    $reserve_time = $_SESSION['RESERVE']['reserve_time'];
+    $name = $_SESSION['RESERVE']['name'];
+    $email = $_SESSION['RESERVE']['email'];
+    $tel = $_SESSION['RESERVE']['tel'];
+    $comment = $_SESSION['RESERVE']['comment'];
 
     //TODO:予約が確定可能かどうか最終チェック
 
     // DBに接続
-    // $pdo = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';', DB_USER, DB_PASSWORD);
-    // $pdo->query('SET NAMES utf8;');
+    $pdo = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';', DB_USER, DB_PASSWORD);
+    $pdo->query('SET NAMES utf8;');
 
     // reserveテーブルにINSERT
-    // $stmt = $pdo->prepare('INSERT INTO reserve (reserve_date, reserve_time, reserve_num, name, email, tel, comment) VALUES (:reserve_date, :reserve_time, :reserve_num, :name, :email, :tel, :comment)');
-    // $stmt->bindValue(':reserve_date', $reserve_date, PDO::PARAM_STR);
-    // $stmt->bindValue(':reserve_time', $reserve_time, PDO::PARAM_STR);
-    // $stmt->bindValue(':reserve_num', $reserve_num, PDO::PARAM_INT);
-    // $stmt->bindValue(':name', $name, PDO::PARAM_STR);
-    // $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-    // $stmt->bindValue(':tel', $tel, PDO::PARAM_STR);
-    // $stmt->bindValue(':comment', $comment, PDO::PARAM_STR);
-    // $stmt->execute();
+    $stmt = $pdo->prepare('INSERT INTO reserve (reserve_date, reserve_time, reserve_num, name, email, tel, comment) VALUES (:reserve_date, :reserve_time, :reserve_num, :name, :email, :tel, :comment)');
+    $stmt->bindValue(':reserve_date', $reserve_date, PDO::PARAM_STR);
+    $stmt->bindValue(':reserve_time', $reserve_time, PDO::PARAM_STR);
+    $stmt->bindValue(':reserve_num', $reserve_num, PDO::PARAM_INT);
+    $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+    $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+    $stmt->bindValue(':tel', $tel, PDO::PARAM_STR);
+    $stmt->bindValue(':comment', $comment, PDO::PARAM_STR);
+    $stmt->execute();
 
     // 予約が正常に完了したらセッションのデータをクリアする
     unset($_SESSION['RESERVE']);
