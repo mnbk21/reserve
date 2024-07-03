@@ -1,21 +1,21 @@
 <?php
 require_once 'functions.php';
 
-// TODO:予約日選択肢配列
+// 予約日選択肢配列
 $reserve_date_array = array(
   "20240601" => "6/30",
   "20240602" => "7/1",
   "20240603" => "7/2",
 );
 
-// TODO:人数選択肢配列
+// 人数選択肢配列
 $reserve_num_array = array(
   "1" => "1",
   "2" => "2",
   "3" => "3",
 );
 
-// TODO:予約時間選択肢配列
+// 予約時間選択肢配列
 $reserve_time_array = array(
   "12:00" => "12:00",
   "13:00" => "13:00",
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   if (!$reserve_date) {
     $err['reserve_date'] = '予約日を入力してください。';
   }
-  // TODO:予約日はプルダウン設定値を決定後にバリデーション実装
+  // 予約日はプルダウン設定値を決定後にバリデーション実装
 
   if (!$reserve_num) {
     $err['reserve_num'] = '人数を入力してください。';
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   if (!$reserve_time) {
     $err['reserve_time'] = '予約時間を入力してください。';
   }
-  // TODO:予約時間はプルダウン設定値を決定後にバリデーション実装
+  // 予約時間はプルダウン設定値を決定後にバリデーション実装
 
   if (!$name) {
     $err['name'] = '氏名を入力してください。';
