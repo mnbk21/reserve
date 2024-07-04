@@ -1,19 +1,14 @@
 <?php
 require_once 'functions.php';
 
-// DBに接続
-$pdo = new PDO('mysql:dbname=' . DB_NAME . ';host=' . DB_HOST . ';', DB_USER, DB_PASSWORD);
-$pdo->query('SET NAMES utf8;');
-
-// ショップデータを取得
-$stmt = $pdo->prepare('SELECT * FROM shop WHERE id = :id');
-$stmt->bindValue(':id', 1, PDO::PARAM_INT);
-$stmt->execute();
-$shop = $stmt->fetch();
-
 // 予約日選択肢配列
+// $reserve_date_array = array(
+//   "20220601" => "6/1",
+//   "20220602" => "6/2",
+//   "20220603" => "6/3",
+// );
 $reserve_date_array = array();
-for ($i = 0; $i <= $shop['reservable_date']; $i++) {
+for ($i = 0; $i <= 10; $i++) {
   // 対象日を取得
   $target_date = strtotime("+{$i} day");
 
@@ -22,17 +17,29 @@ for ($i = 0; $i <= $shop['reservable_date']; $i++) {
 }
 
 // 人数選択肢配列
-$reserve_num_array = array();
-for ($i = 1; $i <= $shop['max_reserve_num']; $i++) {
-  // 配列に設定
-  $reserve_num_array[$i] = $i;
-}
+$reserve_num_array = array(
+  "1" => "1",
+  "2" => "2",
+  "3" => "3",
+  "4" => "4",
+  "5" => "5",
+  "6" => "6",
+);
 
 // 予約時間選択肢配列
-$reserve_time_array = array();
-for ($i = date('G', strtotime($shop['start_time'])); $i <= date('G', strtotime($shop['end_time'])); $i++) {
-  $reserve_time_array[sprintf('%02d', $i) . ':00'] = sprintf('%02d', $i) . ':00';
-}
+$reserve_time_array = array(
+  "12:00" => "12:00",
+  "13:00" => "13:00",
+  "14:00" => "14:00",
+  "15:00" => "15:00",
+  "16:00" => "16:00",
+  "17:00" => "17:00",
+  "18:00" => "18:00",
+  "19:00" => "19:00",
+  "20:00" => "20:00",
+  "21:00" => "21:00",
+  "22:00" => "22:00",
+);
 
 session_start();
 
