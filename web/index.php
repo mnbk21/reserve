@@ -39,93 +39,113 @@ session_start();
 $err = array();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // POSTパラメータから各種入力値を受け取る
-    $reserve_date = $_POST['reserve_date'];
-    $reserve_num = $_POST['reserve_num'];
-    $reserve_time = $_POST['reserve_time'];
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $tel = $_POST['tel'];
-    $comment = $_POST['comment'];
+  // POSTパラメータから各種入力値を受け取る
+  $reserve_date = $_POST['reserve_date'];
+  $reserve_num = $_POST['reserve_num'];
+  $reserve_time = $_POST['reserve_time'];
+  $name = $_POST['name'];
+  $email = $_POST['email'];
+  $tel = $_POST['tel'];
+  $comment = $_POST['comment'];
 
-    // 各種入力値のバリデーション
-    if (!$reserve_date) {
-        $err['reserve_date'] = '予約日を入力してください。';
-    }
-    // TODO:予約日はプルダウン設定値を決定後にバリデーション実装
+  // 各種入力値のバリデーション
+  if (!$reserve_date) {
+      $err['reserve_date'] = '予約日を入力してください。';
+  }
+  // 予約日はプルダウン設定値を決定後にバリデーション実装
 
-    if (!$reserve_num) {
-        $err['reserve_num'] = '人数を入力してください。';
-    } else if (!preg_match('/^[0-9]+$/', $reserve_num)) {
-        $err['reserve_num'] = '人数を正しく入力してください。';
-    }
+  if (!$reserve_num) {
+      $err['reserve_num'] = '人数を入力してください。';
+  } else if (!preg_match('/^[0-9]+$/', $reserve_num)) {
+      $err['reserve_num'] = '人数を正しく入力してください。';
+  }
 
-    if (!$reserve_time) {
-        $err['reserve_time'] = '予約時間を入力してください。';
-    }
-    // TODO:予約時間はプルダウン設定値を決定後にバリデーション実装
+  if (!$reserve_time) {
+      $err['reserve_time'] = '予約時間を入力してください。';
+  }
+  // 予約時間はプルダウン設定値を決定後にバリデーション実装
 
-    if (!$name) {
-        $err['name'] = '氏名を入力してください。';
-    } else if (mb_strlen($name, 'utf-8') > 20) {
-        $err['name'] = '氏名は20文字以内で入力してください。';
-    }
+  if (!$name) {
+      $err['name'] = '氏名を入力してください。';
+  } else if (mb_strlen($name, 'utf-8') > 20) {
+      $err['name'] = '氏名は20文字以内で入力してください。';
+  }
 
-    if (!$email) {
-        $err['email'] = 'メールアドレスを入力してください。';
-    } else if (mb_strlen($email, 'utf-8') > 100) {
-        $err['email'] = 'メールアドレスは100文字以内で入力してください。';
-    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $err['email'] = 'メールアドレスが不正です。';
-    }
+  if (!$email) {
+      $err['email'] = 'メールアドレスを入力してください。';
+  } else if (mb_strlen($email, 'utf-8') > 100) {
+      $err['email'] = 'メールアドレスは100文字以内で入力してください。';
+  } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $err['email'] = 'メールアドレスが不正です。';
+  }
 
-    if (!$tel) {
-        $err['tel'] = '電話番号を入力してください。';
-    } else if (mb_strlen($tel, 'utf-8') > 20) {
-        $err['tel'] = '電話番号は20文字以内で入力してください。';
-    } else if (!preg_match('/^\d{2,4}-\d{2,4}-\d{3,4}$/', $tel)) {
-        $err['tel'] = '電話番号を正しく入力してください。';
-    }
+  if (!$tel) {
+      $err['tel'] = '電話番号を入力してください。';
+  } else if (mb_strlen($tel, 'utf-8') > 20) {
+      $err['tel'] = '電話番号は20文字以内で入力してください。';
+  } else if (!preg_match('/^\d{2,4}-\d{2,4}-\d{3,4}$/', $tel)) {
+      $err['tel'] = '電話番号を正しく入力してください。';
+  }
 
-    if (mb_strlen($comment, 'utf-8') > 2000) {
-        $err['comment'] = '備考欄は2000文字以内で入力してください。';
+  if (mb_strlen($comment, 'utf-8') > 2000) {
+      $err['comment'] = '備考欄は2000文字以内で入力してください。';
+  }
+
+  // エラーが無ければ次の処理に進む
+  if (empty($err)) {
+    // DBのreserveテーブルからその日時の「予約成立済み人数」を取得
+    $stmt = $pdo->prepare("SELECT SUM(reserve_num) FROM reserve
+      WHERE DATE_FORMAT(reserve_date, '%Y%m%d') = :reserve_date AND DATE_FORMAT(reserve_time, '%H:%i') = :reserve_time
+      GROUP BY reserve_date, reserve_time LIMIT 1");
+    $stmt->bindValue(':reserve_date', $reserve_date, PDO::PARAM_STR);
+    $stmt->bindValue(':reserve_time', $reserve_time, PDO::PARAM_STR);
+    $stmt->execute();
+    $reserve_count = $stmt->fetchColumn();
+
+    // var_dump($reserve_count);
+    // exit;
+
+    // 1時間当たりの予約上限チェック
+    if ($reserve_count && ($reserve_count + $reserve_num) > $shop['max_reserve_num']) {
+      $err['common'] = 'この日時はすでに予約が埋まっております。<br>予約画面に戻って予約情報を変更してください。';
     }
 
     // エラーが無ければ次の処理に進む
     if (empty($err)) {
-        // 各種入力値をセッション変数に保存する
-        $_SESSION['RESERVE']['reserve_date'] = $reserve_date;
-        $_SESSION['RESERVE']['reserve_num'] = $reserve_num;
-        $_SESSION['RESERVE']['reserve_time'] = $reserve_time;
-        $_SESSION['RESERVE']['name'] = $name;
-        $_SESSION['RESERVE']['email'] = $email;
-        $_SESSION['RESERVE']['tel'] = $tel;
-        $_SESSION['RESERVE']['comment'] = $comment;
+      // 各種入力値をセッション変数に保存する
+      $_SESSION['RESERVE']['reserve_date'] = $reserve_date;
+      $_SESSION['RESERVE']['reserve_num'] = $reserve_num;
+      $_SESSION['RESERVE']['reserve_time'] = $reserve_time;
+      $_SESSION['RESERVE']['name'] = $name;
+      $_SESSION['RESERVE']['email'] = $email;
+      $_SESSION['RESERVE']['tel'] = $tel;
+      $_SESSION['RESERVE']['comment'] = $comment;
 
-        // 予約確認画面へ遷移する
-        header('Location: /confirm.php');
-        exit;
+      // 予約確認画面へ遷移する
+      header('Location: /confirm.php');
+      exit;
     }
+  }
 } else {
-    // セッションに入力情報がある場合は取得する
-    if (isset($_SESSION['RESERVE'])) {
-        $reserve_date = $_SESSION['RESERVE']['reserve_date'];
-        $reserve_num = $_SESSION['RESERVE']['reserve_num'];
-        $reserve_time = $_SESSION['RESERVE']['reserve_time'];
-        $name = $_SESSION['RESERVE']['name'];
-        $email = $_SESSION['RESERVE']['email'];
-        $tel = $_SESSION['RESERVE']['tel'];
-        $comment = $_SESSION['RESERVE']['comment'];
-    } else {
-        // 存在しない場合は各変数を初期化
-        $reserve_date = '';
-        $reserve_num = '';
-        $reserve_time = '';
-        $name = '';
-        $email = '';
-        $tel = '';
-        $comment = '';
-    }
+  // セッションに入力情報がある場合は取得する
+  if (isset($_SESSION['RESERVE'])) {
+    $reserve_date = $_SESSION['RESERVE']['reserve_date'];
+    $reserve_num = $_SESSION['RESERVE']['reserve_num'];
+    $reserve_time = $_SESSION['RESERVE']['reserve_time'];
+    $name = $_SESSION['RESERVE']['name'];
+    $email = $_SESSION['RESERVE']['email'];
+    $tel = $_SESSION['RESERVE']['tel'];
+    $comment = $_SESSION['RESERVE']['comment'];
+  } else {
+    // 存在しない場合は各変数を初期化
+    $reserve_date = '';
+    $reserve_num = '';
+    $reserve_time = '';
+    $name = '';
+    $email = '';
+    $tel = '';
+    $comment = '';
+  }
 }
 ?>
 <!doctype html>
@@ -151,6 +171,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <h1>ご来店予約</h1>
 
     <form class="m-3" method="post">
+
+      <?php if (isset($err['common'])) : ?>
+        <div class="alert alert-danger" role="alert"><?= $err['common'] ?></div>
+      <?php endif; ?>
+
       <div class="mb-3">
         <label for="exampleFormControlInput1" class="form-label">【1】 予約日を選択</label>
         <?= arrayToSelect('reserve_date', $reserve_date_array, $reserve_date) ?>
