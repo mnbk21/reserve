@@ -10,25 +10,26 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <!-- Original CSS -->
-    <link href="/css/style.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
     <title>予約完了</title>
   </head>
 
   <body>
-    <header>SAMPLE SHOP</header>
+    <div class="wrapper">
+      <header>SAMPLE SHOP</header>
 
-    <h1>予約完了</h1>
+      <h1>予約完了</h1>
 
-    <div class="card text-center">
-      <div class="card-body">
-        <i class="bi bi-check-lg complete-icon"></i>
-        <h2 class="card-title">予約が完了しました。</h2>
-        <div class="d-grid gap-2 my-3">
-          <a class="btn btn-primary rounded-pill" href="/">TOPに戻る</a>
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="bi bi-check-lg complete-icon"></i>
+          <h2 class="card-title">予約が完了しました。</h2>
+          <div class="d-grid gap-2 my-3">
+            <a class="btn btn-primary rounded-pill" href="/">TOPに戻る</a>
+          </div>
         </div>
       </div>
     </div>
-
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: Bootstrap Bundle with Popper -->

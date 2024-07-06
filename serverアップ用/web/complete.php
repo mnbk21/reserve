@@ -10,29 +10,28 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <!-- Original CSS -->
-    <link href="/css/style.css" rel="stylesheet">
-    <title>予約システムログイン</title>
+    <link href="css/style.css" rel="stylesheet">
+    <title>予約完了</title>
   </head>
 
   <body>
-    <header>SAMPLE SHOP</header>
-    <h1>予約システムログイン</h1>
+    <div class="wrapper">
+      <header>SAMPLE SHOP</header>
 
-    <form class="card text-center" method="post" action="reserve_list.php">
-      <div class="card-body">
-        <div class="mb-3">
-          <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="ID">
-        </div>
-        <div class="mb-3">
-          <input type="password" class="form-control" id="exampleFormControlInput1" placeholder="PASSWORD">
-        </div>
-        <div class="d-grid gap-2 my-3">
-          <button class="btn btn-primary rounded-pill" type="submit">ログイン</button>
+      <h1>予約完了</h1>
+
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="bi bi-check-lg complete-icon"></i>
+          <h2 class="card-title">予約が完了しました。</h2>
+          <div class="d-grid gap-2 my-3">
+            <a class="btn btn-primary rounded-pill" href="/reserve/web/">TOPに戻る</a>
+          </div>
         </div>
       </div>
-    </form>
-
+    </div>
     <!-- Optional JavaScript; choose one of the two! -->
+
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 

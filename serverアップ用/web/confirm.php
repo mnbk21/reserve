@@ -56,6 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       // 予約者にメール送信
       $from = 'From: Web予約システムReserve <' . ADMIN_EMAIL . '>';
 
+      // 送信元メールアドレス
+      // $param = "-fmnbk21@gmail.com";
+
       $view_reserve_date = format_date($reserve_date);
 
       $subject = 'ご予約が確定しました。';
@@ -76,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 EOT;
 
           //メール送信テストはサーバー上で実施
-          // mb_send_mail($email, $subject, $body, $from);
+          mb_send_mail($email, $subject, $body, $from);
+          // mb_send_mail($email, $subject, $body, $from , $param);
 
           // 店舗管理者にメール送信
           $subject = '【Reserve】予約が確定しました。';
@@ -92,8 +96,11 @@ EOT;
 [備考]{$comment}
 EOT;
 
+
+
       //メール送信テストはサーバー上で実施
-      // mb_send_mail(ADMIN_EMAIL, $subject, $body, $from);
+      mb_send_mail(ADMIN_EMAIL, $subject, $body, $from);
+      // mb_send_mail(ADMIN_EMAIL, $subject, $body, $from , $param);
 
       // 予約が正常に完了したらセッションのデータをクリアする
       unset($_SESSION['RESERVE']);
@@ -102,7 +109,7 @@ EOT;
       unset($pdo);
 
       // 予約完了画面の表示
-      header('Location: /complete.php');
+      header('Location: /reserve/web/complete.php');
       exit;
     }
   } else {
@@ -171,7 +178,7 @@ EOT;
 
         <div class="d-grid gap-2 mx-3">
           <button class="btn btn-primary rounded-pill" type="submit">予約確定</button>
-          <a class="btn btn-secondary rounded-pill" href="/">戻る</a>
+          <a class="btn btn-secondary rounded-pill" href="/reserve/web/">戻る</a>
         </div>
       </form>
     </div>
